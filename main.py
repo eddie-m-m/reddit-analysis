@@ -21,7 +21,7 @@ def main():
             client_secret=client_secret,
             user_agent=client_user_agent,
         )
-        subreddit = reddit_client.subreddit("dataanalysis")
+        subreddit = reddit_client.subreddit("dataisbeautiful")
 
         for submission in subreddit.top(limit=3):
             print(f" - {submission.title} (Score: {submission.score})")
@@ -29,7 +29,7 @@ def main():
     except Exception as e:
         print(f"error: {e}")
 
-    # connect_to_db(db_url)
+    connect_to_db(db_url)
 
 
 if __name__ == "__main__":

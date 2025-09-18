@@ -131,6 +131,17 @@ files = [
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
 [[package]]
+name = "logging"
+version = "0.4.9.6"
+description = "A logging module for Python"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "logging-0.4.9.6.tar.gz", hash = "sha256:26f6b50773f085042d301085bd1bf5d9f3735704db9f37c1ce6d8b85c38f2417"},
+]
+
+[[package]]
 name = "numpy"
 version = "2.3.3"
 description = "Fundamental package for array computing in Python"
@@ -508,4 +519,4 @@ test = ["websockets"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "0228582ae3d6b1f91b38a1ee1a8aad4c500415db079d773f1673f407ac742cdc"
+content-hash = "6d0a12f9487a308bb11c9c11cb8cbdc5f8cbc074c0fc2cc90639a8a4495fcbaa"

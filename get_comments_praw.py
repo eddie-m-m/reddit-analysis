@@ -1,8 +1,7 @@
-import praw
 import pandas as pd
 
 
-def get_comments_praw(conn, reddit: praw.Reddit, subreddits: list):
+def get_comments_praw(conn, reddit_client, subreddits):
     for subreddit in subreddits:
         print(f"--- Starting comments for subreddit: r/{subreddit} ---")
 
@@ -24,7 +23,7 @@ def get_comments_praw(conn, reddit: praw.Reddit, subreddits: list):
 
         for idx, post_id in enumerate(post_ids):
             try:
-                submission = reddit.submission(id=post_id)
+                submission = reddit_client.submission(id=post_id)
                 submission.comment_sort = "top"
 
                 # This line processes "MoreComments" objects, replacing them with actual comments.

@@ -1,13 +1,12 @@
-import praw
 import pandas as pd
 
 
-def get_posts_praw(conn, reddit: praw.Reddit, subreddits: list):
+def get_posts_praw(conn, reddit_client, subreddits):
     for subreddit in subreddits:
         print(f"--- Starting subreddit: r/{subreddit} ---")
 
         try:
-            subreddit = reddit.subreddit(subreddit)
+            subreddit = reddit_client.subreddit(subreddit)
             top_posts = subreddit.top(time_filter="year", limit=1000)
 
             posts_data = []

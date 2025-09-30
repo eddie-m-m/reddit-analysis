@@ -16,7 +16,7 @@ LOG_FILE="$SCRIPT_DIR/logs/${BASENAME}.log"
 echo "--- Status for $PYTHON_SCRIPT_NAME ---"
 
 if [ -f "$LOCK_FILE" ]; then
-    echo -e "\e[32mSTATUS: RUNNING\e[0m"
+    echo -e "STATUS: RUNNING"
 
     PID=$(pgrep -f "uv run $PYTHON_SCRIPT_NAME")
 
@@ -28,9 +28,9 @@ if [ -f "$LOCK_FILE" ]; then
     fi
 
     echo ""
-    echo "--- Last 5 Log Entries ---"
+    echo "--- Last 30 Log Entries ---"
     if [ -f "$LOG_FILE" ]; then
-        tail -n 5 "$LOG_FILE"
+        tail -n 30 "$LOG_FILE"
     else
         echo "Log file not found."
     fi

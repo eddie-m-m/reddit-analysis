@@ -12,6 +12,48 @@ logging.basicConfig(
 )
 
 
+def fetch_diverse_posts(subreddit, limit, time_interval):
+    logging.info(f"Fetching diverse posts for r/{subreddit.display_name}...")
+
+    posts = {}
+
+    try:
+        for post in subreddit.top(limit=limit, time_filter=time_interval):
+            posts[post.id] = post
+    except Exception as e:
+        logging.warning(
+            f"Could not fetch 'top' posts for r/{subreddit.display_name}: {e}"
+        )
+
+    try:
+        for post in subreddit.hot(limit=limit):
+            posts[post.id] = post
+    except Exception as e:
+        logging.warning(
+            f"Could not fetch 'hot' posts for r/{subreddit.display_name}: {e}"
+        )
+
+    try:
+        for post in subreddit.new(limit=limit):
+            posts[post.id] = post
+    except Exception as e:
+        logging.warning(
+            f"Could not fetch 'new' posts for r/{subreddit.display_name}: {e}"
+        )
+
+    try:
+        for post in subreddit.controversial(limit=limit, time_filter=time_interval):
+            posts[post.id] = post
+    except Exception as e:
+        logging.warning(
+            f"Could not fetch 'controversial' posts for r/{subreddit.display_name}: {e}"
+        )
+
+    logging.info(f"Found {len(posts)} unique posts across categories.")
+
+    return list(posts.values())
+
+
 def bulk_upsert_authors(db_client, authors):
     if not authors:
         return
@@ -89,14 +131,16 @@ def populate_posts_table(praw_client, db_client, subreddits, limit, time_interva
             existing_post_ids = get_existing_post_ids(db_client, subreddit_id)
 
             subreddit = praw_client.reddit.subreddit(subreddit)
-            top_posts = subreddit.top(limit=limit, time_filter=time_interval)
+            all_posts = fetch_diverse_posts(
+                subreddit, limit=limit, time_interval=time_interval
+            )
 
             posts = []
             authors = {}
 
-            top_posts_iter = tqdm(top_posts, desc=f"f/{subreddit}", leave=False)
+            all_posts_iter = tqdm(all_posts, desc=f"f/{subreddit}", leave=False)
 
-            for post in top_posts_iter:
+            for post in all_posts_iter:
                 if post.id in existing_post_ids:
                     continue
 
@@ -158,8 +202,8 @@ try:
         praw_client=praw_client,
         db_client=db_client,
         subreddits=SUBREDDITS,
-        limit=1000,
-        time_interval="year",
+        limit=None,
+        time_interval="all",
     )
 except Exception as e:
     logging.critical(f"A critical error stopped the script: {e}", exc_info=True)

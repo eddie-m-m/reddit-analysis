@@ -11,6 +11,15 @@ class DBClient:
             print(f"Failed to create DB engine: {e}")
             raise
 
+    def fetch_one(self, query, params=None):
+        try:
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params or {})
+                return result.mappings().first()
+        except Exception as e:
+            print(f"Error fetching single row: {e}")
+            return None
+
     def fetch_all(self, query, params=None):
         try:
             with self.engine.connect() as conn:

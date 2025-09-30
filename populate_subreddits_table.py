@@ -1,39 +1,28 @@
 from datetime import datetime
 from db_client import DBClient
-
-subreddits = [
-    "dataisbeautiful",
-    "SQL",
-    "dataanalysis",
-    "statistics",
-    "datascience",
-    "businessanalysis",
-    "visualization",
-    "dataengineering",
-    "MachineLearning",
-    "businessintelligence",
-]
+from config import SUBREDDITS, DB_URL
 
 
-def populate_subreddits_table(subreddits):
+def populate_subreddits_table(db_client, subreddits):
     query = """
             INSERT INTO subreddits
             (subreddit, collection_date)
-            VALUES (%s, %s);
+            VALUES (:subreddit, :collection_date);
         """
 
     try:
-        with DBClient() as db:
-            now = datetime.now()
-            data = [(subreddit, now) for subreddit in subreddits]
+        now = datetime.now()
+        data = [
+            {"subreddit": subreddit, "collection_date": now} for subreddit in subreddits
+        ]
 
-            print("Executing query...")
-            db.cursor.executemany(query, data)
+        print("Executing query...")
+        row_count = db_client.execute(query, data)
 
-            print(f"{db.cursor.rowcount} rows were inserted successfully")
+        print(f"{row_count} rows were inserted successfully")
 
     except Exception as e:
         print(f"Error occurred trying to popupate subreddits table: {e}")
 
 
-populate_subreddits_table(subreddits=subreddits)
+populate_subreddits_table(db_client=DBClient(DB_URL), subreddits=SUBREDDITS)

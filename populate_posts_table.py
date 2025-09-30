@@ -1,7 +1,6 @@
 import logging
+from datetime import datetime, timezone
 from tqdm import tqdm
-import pandas as pd
-from sqlalchemy import create_engine
 from db_client import DBClient
 from praw_client import PrawClient
 from config import SUBREDDITS, DB_URL
@@ -13,6 +12,44 @@ logging.basicConfig(
 )
 
 
+def bulk_upsert_authors(db_client, authors):
+    if not authors:
+        return
+
+    author_list = [
+        {"fullname": fullname, "name": name} for fullname, name in authors.items()
+    ]
+
+    query = """
+        INSERT INTO authors (author_fullname, author_name)
+        VALUES (:fullname, :name)
+        ON CONFLICT (author_fullname) DO NOTHING
+    """
+
+    db_client.execute(query, author_list)
+    logging.info(f"Bulk upserted {len(author_list)} unique authors.")
+
+
+def bulk_upsert_posts(db_client, posts):
+    if not posts:
+        return 0
+
+    query = """
+        INSERT INTO posts (
+            post_id, subreddit_id, author_fullname, title, selftext, url, 
+            flair, created_utc, score, num_comments, upvote_ratio, stickied
+        )
+        VALUES (
+            :post_id, :subreddit_id, :author_fullname, :title, :selftext, :url, 
+            :flair, :created_utc, :score, :num_comments, :upvote_ratio, :stickied
+        )
+        ON CONFLICT (post_id) DO NOTHING
+    """
+
+    row_count = db_client.execute(query, posts)
+    return row_count
+
+
 def get_subreddit_id(db_client, subreddit):
     query = """
         SELECT subreddit_id
@@ -21,18 +58,27 @@ def get_subreddit_id(db_client, subreddit):
     """
     params = {"subreddit": subreddit}
 
-    result = db_client.fetch_all(query, params)
+    result = db_client.fetch_one(query, params)
 
     if result:
-        return result[0]["subreddit_id"]
+        return result["subreddit_id"]
     else:
-        raise ValueError(
-            f"Subreddit 'r/{subreddit}' not found in the database. "
-            "Pre-populate before running this script."
-        )
+        raise ValueError(f"Subreddit 'r/{subreddit}' not found in the database. ")
 
 
-def get_posts(praw_client, db_client, sql_engine, subreddits, limit, time_interval):
+def get_existing_post_ids(db_client, subreddit_id):
+    query = """SELECT post_id
+    FROM posts
+    WHERE subreddit_id = :subreddit_id
+    """
+
+    params = {"subreddit_id": subreddit_id}
+    result = db_client.fetch_all(query, params)
+
+    return {row["post_id"] for row in result}
+
+
+def populate_posts_table(praw_client, db_client, subreddits, limit, time_interval):
     total_new_posts = 0
     for subreddit in tqdm(subreddits, desc="Overall Progress"):
         try:
@@ -40,27 +86,42 @@ def get_posts(praw_client, db_client, sql_engine, subreddits, limit, time_interv
 
             subreddit_id = get_subreddit_id(db_client, subreddit)
 
+            existing_post_ids = get_existing_post_ids(db_client, subreddit_id)
+
             subreddit = praw_client.reddit.subreddit(subreddit)
             top_posts = subreddit.top(limit=limit, time_filter=time_interval)
 
             posts = []
+            authors = {}
+
             top_posts_iter = tqdm(top_posts, desc=f"f/{subreddit}", leave=False)
 
             for post in top_posts_iter:
+                if post.id in existing_post_ids:
+                    continue
+
+                if post.author:
+                    authors[post.author_fullname] = post.author.name
+                    author_fullname = post.author_fullname
+                else:
+                    author_fullname = None
+
                 posts.append(
                     {
                         "post_id": post.id,
                         "subreddit_id": subreddit_id,
+                        "author_fullname": author_fullname,
                         "title": post.title,
                         "flair": post.link_flair_text,
                         "selftext": post.selftext,
                         "url": post.url,
-                        "author": post.author.name if post.author else "[deleted]",
-                        "created_utc": pd.to_datetime(
-                            post.created_utc, unit="s", utc=True
+                        "created_utc": datetime.fromtimestamp(
+                            post.created_utc, tz=timezone.utc
                         ),
                         "score": post.score,
                         "num_comments": post.num_comments,
+                        "upvote_ratio": post.upvote_ratio,
+                        "stickied": post.stickied,
                     }
                 )
 
@@ -68,10 +129,9 @@ def get_posts(praw_client, db_client, sql_engine, subreddits, limit, time_interv
                 logging.warning(f"No posts found for r/{subreddit}. Skipping.")
                 continue
 
-            df = pd.DataFrame(posts)
-            df.to_sql(name="posts", con=sql_engine, if_exists="append", index=False)
+            bulk_upsert_authors(db_client, authors)
 
-            inserted_count = len(df)
+            inserted_count = bulk_upsert_posts(db_client, posts)
             total_new_posts += inserted_count
 
             logging.info(
@@ -92,13 +152,11 @@ def get_posts(praw_client, db_client, sql_engine, subreddits, limit, time_interv
 
 praw_client = PrawClient()
 db_client = DBClient(DB_URL)
-sql_engine = create_engine(DB_URL)
 
 try:
-    get_posts(
+    populate_posts_table(
         praw_client=praw_client,
         db_client=db_client,
-        sql_engine=sql_engine,
         subreddits=SUBREDDITS,
         limit=1000,
         time_interval="year",

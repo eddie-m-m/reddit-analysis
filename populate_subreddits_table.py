@@ -7,7 +7,8 @@ def populate_subreddits_table(db_client, subreddits):
     query = """
             INSERT INTO subreddits
             (subreddit, collection_date)
-            VALUES (:subreddit, :collection_date);
+            VALUES (:subreddit, :collection_date)
+            ON CONFLICT(subreddit) DO NOTHING;
         """
 
     try:

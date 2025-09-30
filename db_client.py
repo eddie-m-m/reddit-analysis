@@ -1,46 +1,31 @@
-import psycopg2
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-db_url = os.getenv("DATABASE_URL")
+from sqlalchemy import create_engine, text
+from config import DB_URL
 
 
 class DBClient:
-    def __init__(self):
-        self.conn = None
-        self.cursor = None
-
-    def __enter__(self):
+    def __init__(self, db_url=DB_URL):
         try:
-            print("Connecting to PostgreSQL database...")
-            self.conn = psycopg2.connect(db_url)
-
-            self.cursor = self.conn.cursor()
-
-            print("Connection successful!")
-
-            return self
-
+            self.engine = create_engine(db_url)
+            print("Successful DBClient init")
         except Exception as e:
-            print(f"Error occurred during connection: {e}")
-
+            print(f"Failed to create DB engine: {e}")
             raise
 
-    def __exit__(self, exception_type, exception_value, exception_traceback):
-        if exception_type is not None:
-            if self.cursor:
-                self.conn.rollback()
-            print(
-                f"An exception occured: {exception_value}. Rolling back transaction..."
-            )
-        else:
-            if self.conn:
-                self.conn.commit()
+    def fetch_all(self, query, params=None):
+        try:
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params or {})
+                return result.mappings().all()
+        except Exception as e:
+            print(f"Error fetching data: {e}")
+            return []
 
-        if self.cursor:
-            self.cursor.close()
-        if self.conn:
-            self.conn.close()
-            print("Database connection closed.")
+    def execute(self, query, params=None):
+        try:
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params or {})
+                conn.commit()
+                return result.rowcount
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return 0

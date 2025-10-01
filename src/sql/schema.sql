@@ -1,4 +1,5 @@
 -- schema.sql
+DROP TABLE IF EXISTS cleaned_comments;
 DROP TABLE IF EXISTS sentiment_analysis;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS posts;
@@ -49,19 +50,25 @@ CREATE TABLE comments (
 CREATE TABLE sentiment_analysis (
     analysis_id SERIAL PRIMARY KEY,
     comment_id VARCHAR(20) NOT NULL REFERENCES comments(comment_id) ON DELETE CASCADE,
-    cleaned_body TEXT,
     vader_compound FLOAT,
     vader_positive FLOAT,
     vader_negative FLOAT,
     vader_neutral FLOAT,
-    word_count INTEGER,
     UNIQUE(comment_id)
+);
+CREATE TABLE cleaned_comments (
+    comment_id VARCHAR(20) PRIMARY KEY,
+    cleaned_body TEXT,
+    word_count INTEGER,
+    cleaning_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );
 CREATE INDEX idx_posts_subreddit_id ON posts(subreddit_id);
 CREATE INDEX idx_posts_author_fullname ON posts(author_fullname);
 CREATE INDEX idx_comments_post_id ON comments(post_id);
 CREATE INDEX idx_comments_author_fullname ON comments(author_fullname);
 CREATE INDEX idx_sentiment_analysis_comment_id ON sentiment_analysis(comment_id);
+CREATE INDEX idx_cleaned_comments_comment_id ON cleaned_comments(comment_id);
 -- for reconstructing comment threads
 CREATE INDEX idx_comments_parent_id ON comments(parent_id);
 -- for time-series analysis

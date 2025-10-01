@@ -2,8 +2,7 @@ import logging
 import os
 from datetime import datetime, timezone
 from tqdm import tqdm
-from db_client import DBClient
-from praw_client import PrawClient
+from clients import DBClient, PrawClient
 from config import SUBREDDITS, DB_URL
 
 log_file_name = "posts_table_populate.log"

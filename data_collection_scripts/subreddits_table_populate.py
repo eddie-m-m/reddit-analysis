@@ -1,7 +1,6 @@
 from tqdm import tqdm
 from datetime import datetime
-from praw_client import PrawClient
-from db_client import DBClient
+from clients import DBClient, PrawClient
 from config import SUBREDDITS, DB_URL
 
 

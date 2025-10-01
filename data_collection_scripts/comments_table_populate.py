@@ -3,8 +3,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from sqlalchemy import create_engine
-from db_client import DBClient
-from praw_client import PrawClient
+from clients import DBClient, PrawClient
 from config import SUBREDDITS, DB_URL
 
 log_file_name = "comments_table_populate.log"

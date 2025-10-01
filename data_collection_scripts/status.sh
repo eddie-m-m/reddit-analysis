@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z "$1" ]]; then
-    echo "Usage: $0 <your_script_name.py>"
+    echo "Usage: $0 <script_name.py>"
     exit 1
 fi
 

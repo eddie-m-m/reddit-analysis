@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $# -ne 2 ]]; then
-    echo "Usage: $0 {install|uninstall} <script_name.py>"
+    echo "Usage: $0 {install|uninstall|run} <script_name.py>"
     exit 1
 fi
 
@@ -34,7 +34,7 @@ install_cron() {
     echo "Installing cron job for $PYTHON_SCRIPT_NAME..."
     mkdir -p "$(dirname "$LOG_FILE")"
     
-    local cmd_array=(
+    local CMD_ARRAY=(
         bash 
         -c 
         "cd \"$SCRIPT_DIR\" && \"$UV_PATH\" run \"$PYTHON_SCRIPT_NAME\""
@@ -46,7 +46,7 @@ install_cron() {
     echo "---"
     
     echo "Triggering immediate first run in the background..."
-    nohup /usr/bin/flock -n "$LOCK_FILE" "${cmd_array[@]}" >> "$LOG_FILE" 2>&1 &
+    nohup /usr/bin/flock -n "$LOCK_FILE" "${CMD_ARRAY[@]}" >> "$LOG_FILE" 2>&1 &
     
     echo "Job started. Use './status.sh $PYTHON_SCRIPT_NAME' to monitor."
 }
@@ -57,13 +57,41 @@ uninstall_cron() {
     echo "Cron job uninstalled."
 }
 
+run_script() {
+    echo "Running script $PYTHON_SCRIPT_NAME immediately..."
+    mkdir -p "$(dirname "$LOG_FILE")"
+    
+    local CMD_ARRAY=(
+        bash 
+        -c 
+        "cd \"$SCRIPT_DIR\" && \"$UV_PATH\" run \"$PYTHON_SCRIPT_NAME\""
+    )
+
+
+    echo "--- Start Run: $(date) ---" >> "$LOG_FILE"
+
+    "${CMD_ARRAY[@]}" | tee -a "$LOG_FILE"
+    
+    EXIT_CODE=$?
+    echo "--- End Run: (Exit Code: $EXIT_CODE): $(date) ---" >> "$LOG_FILE"
+
+    if [[ $EXIT_CODE -eq 0 ]]; then
+        echo "Script completed successfully."
+    else
+        echo "Script execution failed with exit code $EXIT_CODE."
+    fi
+
+    return $EXIT_CODE
+}
 
 if [[ "$ACTION" == "install" ]]; then
     install_cron
 elif [[ "$ACTION" == "uninstall" ]]; then
     uninstall_cron
+elif [[ "$ACTION" == "run" ]]; then
+    run_script
 else
-    echo "Error: Invalid action '$ACTION'. Use 'install' or 'uninstall'."
-    echo "Usage: $0 {install|uninstall} <your_script_name.py>"
+    echo "Error: Invalid action '$ACTION'. Use 'install' or 'uninstall' or 'run'."
+    echo "Usage: $0 {install|uninstall|run} <script_name.py>"
     exit 1
 fi

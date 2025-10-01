@@ -3,18 +3,18 @@ import os
 
 load_dotenv()
 
+# "dataisbeautiful",
+# "SQL",
+# "dataanalysis",
+# "statistics",
+# "datascience",
+# "businessanalysis",
+# "visualization",
+# "dataengineering",
+# "MachineLearning",
+# "businessintelligence",
 
 SUBREDDITS = [
-    "dataisbeautiful",
-    "SQL",
-    "dataanalysis",
-    "statistics",
-    "datascience",
-    "businessanalysis",
-    "visualization",
-    "dataengineering",
-    "MachineLearning",
-    "businessintelligence",
     "deeplearning",
     "rstats",
     "PowerBI",

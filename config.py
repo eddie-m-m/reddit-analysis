@@ -15,6 +15,21 @@ SUBREDDITS = [
     "dataengineering",
     "MachineLearning",
     "businessintelligence",
+    "deeplearning",
+    "rstats",
+    "PowerBI",
+    "tableau",
+    "Looker",
+    "LookerStudio",
+    "bigdata",
+    "analytics",
+    "analyticsengineering",
+    "LanguageTechnology",
+    "excel",
+    "MicrosoftExcel",
+    "googlesheets",
+    "learnmachinelearning",
+    "businessanalyst",
 ]
 
 DB_URL = os.getenv("DATABASE_URL")

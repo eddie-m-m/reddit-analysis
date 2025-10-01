@@ -11,7 +11,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 BASENAME=$(basename "$PYTHON_SCRIPT_NAME" .py)
 LOCK_FILE="/tmp/${BASENAME}.lock"
-LOG_FILE="$SCRIPT_DIR/logs/${BASENAME}.log"
+LOG_FILE="$SCRIPT_DIR/logs/cron/${BASENAME}.log"
 
 echo "--- Status for $PYTHON_SCRIPT_NAME ---"
 

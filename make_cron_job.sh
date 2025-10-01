@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $# -ne 2 ]]; then
-    echo "Usage: $0 {install|uninstall} <your_script_name.py>"
+    echo "Usage: $0 {install|uninstall} <script_name.py>"
     exit 1
 fi
 
@@ -18,7 +18,7 @@ fi
 
 BASENAME=$(basename "$PYTHON_SCRIPT_NAME" .py)
 LOCK_FILE="/tmp/${BASENAME}.lock"
-LOG_FILE="$SCRIPT_DIR/logs/${BASENAME}.log"
+LOG_FILE="$SCRIPT_DIR/logs/cron/${BASENAME}.log"
 CRON_COMMENT="# Cron job for $PYTHON_SCRIPT_NAME"
 
 UV_PATH=$(which uv)

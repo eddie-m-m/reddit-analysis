@@ -1,4 +1,4 @@
-import tqdm
+from tqdm import tqdm
 from datetime import datetime
 from praw_client import PrawClient
 from db_client import DBClient
@@ -8,25 +8,25 @@ from config import SUBREDDITS, DB_URL
 def subreddits_table_populate(praw_client, db_client, subreddits):
     query = """
             INSERT INTO subreddits
-            (subreddit, :member_count, :member_count_date, :collection_date) 
-            VALUES (:subreddit, :member_count, :member_count_date, :collection_date)
+            (subreddit, collection_date, member_count, member_count_date) 
+            VALUES (:subreddit, :collection_date, :member_count, :member_count_date)
             ON CONFLICT(subreddit) DO UPDATE SET
                 member_count = EXCLUDED.member_count,
                 member_count_date = EXCLUDED.member_count_date,
-                collection_date EXCLUDED.collection_date;
+                collection_date = EXCLUDED.collection_date;
         """
 
     now = datetime.now()
     data = []
 
-    for subreddit in tqdm(subreddits, desc="Overall Progress"):
+    for subreddit_name in tqdm(subreddits, desc="Overall Progress"):
         try:
-            subreddit = praw_client.reddit.subreddit(subreddit)
+            subreddit = praw_client.reddit.subreddit(subreddit_name)
             member_count = subreddit.subscribers
 
             data.append(
                 {
-                    "subreddit": subreddit,
+                    "subreddit": subreddit_name,
                     "member_count": member_count,
                     "member_count_date": now,
                     "collection_date": now,

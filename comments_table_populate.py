@@ -1,4 +1,5 @@
 import logging
+import os
 import pandas as pd
 from tqdm import tqdm
 from sqlalchemy import create_engine
@@ -6,10 +7,19 @@ from db_client import DBClient
 from praw_client import PrawClient
 from config import SUBREDDITS, DB_URL
 
+log_file_name = "comments_table_populate.log"
+log_dir = os.path.join("logs", "scripts")
+log_path = os.path.join(log_dir, log_file_name)
+
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] - %(message)s",
-    handlers=[logging.FileHandler("comments_collection.log"), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler(log_path),
+        logging.StreamHandler(),
+    ],
 )
 
 
@@ -69,7 +79,7 @@ def get_processed_post_ids(db_client, subreddit_id):
     return [row["post_id"] for row in result]
 
 
-def populate_comments_table(
+def comments_table_populate(
     praw_client, db_client, sql_engine, subreddits, batch_size=25
 ):
     total_new_comments = 0
@@ -184,7 +194,7 @@ db_client = DBClient(DB_URL)
 sql_engine = create_engine(DB_URL)
 
 try:
-    populate_comments_table(
+    comments_table_populate(
         praw_client=praw_client,
         db_client=db_client,
         sql_engine=sql_engine,

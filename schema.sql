@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS subreddits;
 CREATE TABLE subreddits (
     subreddit_id SERIAL PRIMARY KEY,
     subreddit VARCHAR(255) UNIQUE NOT NULL,
+    member_count INTEGER,
+    member_count_date TIMESTAMP,
     collection_date TIMESTAMP
 );
 -- authors: author names and unique reddit ids

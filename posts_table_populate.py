@@ -1,14 +1,24 @@
 import logging
+import os
 from datetime import datetime, timezone
 from tqdm import tqdm
 from db_client import DBClient
 from praw_client import PrawClient
 from config import SUBREDDITS, DB_URL
 
+log_file_name = "posts_table_populate.log"
+log_dir = os.path.join("logs", "scripts")
+log_path = os.path.join(log_dir, log_file_name)
+
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] - %(message)s",
-    handlers=[logging.FileHandler("posts_collection.log"), logging.StreamHandler()],
+    handlers=[
+        logging.FileHandler(log_path),
+        logging.StreamHandler(),
+    ],
 )
 
 
@@ -120,7 +130,7 @@ def get_existing_post_ids(db_client, subreddit_id):
     return {row["post_id"] for row in result}
 
 
-def populate_posts_table(praw_client, db_client, subreddits, limit, time_interval):
+def posts_table_populate(praw_client, db_client, subreddits, limit, time_interval):
     total_new_posts = 0
     for subreddit in tqdm(subreddits, desc="Overall Progress"):
         try:
@@ -198,7 +208,7 @@ praw_client = PrawClient()
 db_client = DBClient(DB_URL)
 
 try:
-    populate_posts_table(
+    posts_table_populate(
         praw_client=praw_client,
         db_client=db_client,
         subreddits=SUBREDDITS,

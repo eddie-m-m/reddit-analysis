@@ -54,6 +54,7 @@ CREATE TABLE sentiment_analysis (
     vader_positive FLOAT,
     vader_negative FLOAT,
     vader_neutral FLOAT,
+    word_count INTEGER,
     UNIQUE(comment_id)
 );
 CREATE INDEX idx_posts_subreddit_id ON posts(subreddit_id);

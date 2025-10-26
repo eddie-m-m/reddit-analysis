@@ -17,4 +17,5 @@ dependencies = [
     "pyarrow>=21.0.0",
     "sqlalchemy>=2.0.43",
     "tqdm>=4.67.1",
+    "vadersentiment>=3.3.2",
 ]

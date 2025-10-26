@@ -2,7 +2,7 @@ services:
   db:
     container_name: reddit-db
     image: postgres
-    restart: always
+    restart: no
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

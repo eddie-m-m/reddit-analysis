@@ -22,7 +22,7 @@ How useful do people find subreddits related to topics of "data"? We answer this
 - _Average Compound Score_ ($\bar C$) : the mean of all compound scores per subreddit.
 
 - _Sentiment-Weighted Engagement_ (SWE): $\frac{1}{N}\sum_{i=1}^{N} C_{i} \times log(MAX(0,score_{i}) + 1))$
-- _Constructive Ratio_ (CR): $\frac{\#\space of\space positive}{\#\space of\space negative\space +\space 1}$.
+- _Constructive Ratio_ (CR): $\frac{number \space of\space positive}{number\space of\space negative\space +\space 1}$.
 
   "Positive" is a `vader_compound` score `>= 0.05`. "Negative" is a `vader_compound` score `<= -0.05`.
 

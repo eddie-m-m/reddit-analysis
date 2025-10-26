@@ -25,20 +25,11 @@ logging.basicConfig(
 def get_comments(db_client):
     logging.info("Fetching new comments for sentiment analysis...")
 
-    # query = """
-    # SELECT c.comment_id, c.body
-    # FROM comments AS c
-    # LEFT JOIN sentiment_analysis AS sa ON c.comment_id = sa.comment_id
-    # WHERE sa.analysis_id IS NULL;
-    # """
-
-    # test query
     query = """
     SELECT c.comment_id, c.body
     FROM comments AS c
     LEFT JOIN sentiment_analysis AS sa ON c.comment_id = sa.comment_id
-    WHERE sa.analysis_id IS NULL
-    LIMIT 100;
+    WHERE sa.analysis_id IS NULL;
     """
 
     comments = db_client.fetch_all(query)
@@ -94,8 +85,6 @@ def sentiment_analysis_populate(db_client):
 
     bulk_insert_sentiments(db_client, results_data)
 
-
-logging.info("--- STARTING VADER SENTIMENT ANALYSIS SCRIPT ---")
 
 db_client = DBClient(DB_URL)
 

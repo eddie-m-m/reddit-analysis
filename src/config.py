@@ -3,18 +3,20 @@ import os
 
 load_dotenv()
 
-# "dataisbeautiful",
-# "SQL",
-# "dataanalysis",
-# "statistics",
-# "datascience",
-# "businessanalysis",
-# "visualization",
-# "dataengineering",
-# "MachineLearning",
-# "businessintelligence",
-
 SUBREDDITS = [
+    "data",
+    "database",
+    "datamining",
+    "data_warehousing",
+    "SQL",
+    "dataanalysis",
+    "statistics",
+    "datascience",
+    "businessanalysis",
+    "visualization",
+    "dataengineering",
+    "MachineLearning",
+    "businessintelligence",
     "deeplearning",
     "rstats",
     "PowerBI",
@@ -33,3 +35,31 @@ SUBREDDITS = [
 ]
 
 DB_URL = os.getenv("DATABASE_URL")
+
+used = [
+    "dataisbeautiful",
+    "SQL",
+    "dataanalysis",
+    "statistics",
+    "datascience",
+    "businessanalysis",
+    "visualization",
+    "dataengineering",
+    "MachineLearning",
+    "businessintelligence",
+    "deeplearning",
+    "rstats",
+    "PowerBI",
+    "tableau",
+    "Looker",
+    "LookerStudio",
+    "bigdata",
+    "analytics",
+    "analyticsengineering",
+    "LanguageTechnology",
+    "excel",
+    "MicrosoftExcel",
+    "googlesheets",
+    "learnmachinelearning",
+    "businessanalyst",
+]

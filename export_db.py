@@ -14,7 +14,14 @@ db_params = {
     "port": os.getenv("DB_PORT"),
 }
 
-tables_to_export = ["subreddits", "authors", "posts", "comments", "sentiment_analysis"]
+tables_to_export = [
+    "subreddits",
+    "authors",
+    "posts",
+    "comments",
+    "sentiment_analysis",
+    "cleaned_comments",
+]
 
 CSV_DIR = "csv_exports"
 PARQUET_DIR = "parquet_exports"
@@ -73,8 +80,8 @@ def convert_csv_to_parquet():
         print(f"An error occurred during Parquet conversion: {e}")
 
 
-print("--- ETL SCRIPT: PostgreSQL to Parquet ---")
+print("--- Starting PostgreSQL to Parquet ---")
 create_directories()
 export_postgres_to_csv()
 convert_csv_to_parquet()
-print("\n--- ETL Process Finished ---")
+print("\n--- Process Finished ---")

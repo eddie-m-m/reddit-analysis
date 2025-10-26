@@ -27,19 +27,11 @@ logging.basicConfig(
 def get_comments(db_client):
     logging.info("Fetching new comments for cleaning...")
 
-    # query = """
-    # SELECT c.comment_id, c.body
-    # FROM comments AS c
-    # LEFT JOIN cleaned_comments AS cc ON c.comment_id = cc.comment_id
-    # WHERE cc.comment_id IS NULL;
-    # """
-    # test query
     query = """
     SELECT c.comment_id, c.body
     FROM comments AS c
     LEFT JOIN cleaned_comments AS cc ON c.comment_id = cc.comment_id
-    WHERE cc.comment_id IS NULL
-    LIMIT 100;
+    WHERE cc.comment_id IS NULL;
     """
 
     comments = db_client.fetch_all(query)

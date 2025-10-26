@@ -63,6 +63,13 @@ CREATE TABLE cleaned_comments (
     cleaning_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );
+CREATE TABLE labeled_comments (
+    label_id SERIAL PRIMARY KEY,
+    comment_id VARCHAR(20) NOT NULL REFERENCES comments(comment_id) ON DELETE CASCADE,
+    label INTEGER NOT NULL,
+    labeled_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(comment_id)
+);
 CREATE INDEX idx_posts_subreddit_id ON posts(subreddit_id);
 CREATE INDEX idx_posts_author_fullname ON posts(author_fullname);
 CREATE INDEX idx_comments_post_id ON comments(post_id);
@@ -73,3 +80,4 @@ CREATE INDEX idx_cleaned_comments_comment_id ON cleaned_comments(comment_id);
 CREATE INDEX idx_comments_parent_id ON comments(parent_id);
 -- for time-series analysis
 CREATE INDEX idx_posts_created_utc ON posts(created_utc);
+CREATE INDEX idx_labeled_comments_comment_id ON labeled_comments(comment_id);
